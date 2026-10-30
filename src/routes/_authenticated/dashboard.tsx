@@ -9,6 +9,7 @@ import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { SmartPlanner } from '../../components/SmartPlanner';
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Birlyk" }, { name: "description", content: "Manage your events, guests and venue maps." }] }),
@@ -68,6 +69,8 @@ function Dashboard() {
       <p className="text-muted-foreground">{t("dash_hello")}, {profile.data?.full_name || user.email}{profile.data?.organization ? ` · ${profile.data.organization}` : ""}</p>
       <h1 className="text-3xl font-extrabold">{t("dash_title")}</h1>
 
+      <SmartPlanner /> 
+      
       <form onSubmit={create} className="mt-6 flex gap-2 max-w-xl">
         <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("ev_title")} className="h-11 rounded-xl" maxLength={120} />
         <Button type="submit" className="h-11 rounded-xl"><Plus className="h-4 w-4" />{t("dash_new")}</Button>

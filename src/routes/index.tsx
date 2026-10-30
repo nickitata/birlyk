@@ -5,6 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { GuestLookup } from "@/components/GuestLookup";
+import { SmartPlanner } from '../components/SmartPlanner';
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -50,6 +51,9 @@ function Index() {
       <section id="lookup" className="mx-auto max-w-4xl px-4 -mt-12 relative scroll-mt-24">
         <GuestLookup showDemoHint />
       </section>
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        <SmartPlanner />
+      </div>
 
       <section className="mx-auto grid max-w-6xl gap-5 px-4 py-20 md:grid-cols-3">
         {[
