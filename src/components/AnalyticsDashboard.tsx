@@ -1,13 +1,47 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export const AnalyticsDashboard: React.FC = () => {
-  // Исходные данные для анализа
+  const [loading, setLoading] = useState<boolean>(true);
+  const [totalEvents, setTotalEvents] = useState<number>(0);
   const [confirmedGuests, setConfirmedGuests] = useState<number>(85);
   const [pendingGuests, setPendingGuests] = useState<number>(25);
   const [declinedGuests, setDeclinedGuests] = useState<number>(10);
   const [hallCapacity, setHallCapacity] = useState<number>(150);
 
-  // 1. Data Analysis (Математические вычисления и метрики)
+  // Загрузка реальной статистики по всем мероприятиям из Supabase
+  useEffect(() => {
+    async function loadRealData() {
+      try {
+        const { data: eventsData } = await supabase.from('events').select('id');
+        const { data: guestsData } = await supabase.from('guests').select('status');
+
+        if (eventsData) {
+          setTotalEvents(eventsData.length);
+        }
+
+        if (guestsData && guestsData.length > 0) {
+          const confirmed = guestsData.filter((g: any) => g.status === 'confirmed' || g.status === 'attending').length;
+          const pending = guestsData.filter((g: any) => g.status === 'pending' || !g.status).length;
+          const declined = guestsData.filter((g: any) => g.status === 'declined').length;
+
+          if (confirmed + pending + declined > 0) {
+            setConfirmedGuests(confirmed);
+            setPendingGuests(pending);
+            setDeclinedGuests(declined);
+          }
+        }
+      } catch (err) {
+        console.log('Загружены демонстрационные метрики аналитики');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadRealData();
+  }, []);
+
+  // Вычисления
   const totalInvited = confirmedGuests + pendingGuests + declinedGuests;
   const occupancyRate = hallCapacity > 0 ? Math.round((confirmedGuests / hallCapacity) * 100) : 0;
   const confirmationRate = totalInvited > 0 ? Math.round((confirmedGuests / totalInvited) * 100) : 0;
@@ -24,11 +58,18 @@ export const AnalyticsDashboard: React.FC = () => {
       marginTop: '20px',
       color: '#0f172a'
     }}>
-      <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px' }}>
-        📊 Data Analysis & Event Visualization (Аналитика мероприятия)
-      </h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: 'bold', margin: 0 }}>
+          📊 Data Analysis & Event Visualization
+        </h2>
+        {totalEvents > 0 && (
+          <span style={{ fontSize: '12px', padding: '4px 10px', backgroundColor: '#e0f2fe', color: '#0369a1', borderRadius: '12px', fontWeight: '600' }}>
+            Всего событий в системе: {totalEvents}
+          </span>
+        )}
+      </div>
 
-      {/* Метрики аналитики */}
+      {/* Карточки ключевых показателей */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px', marginBottom: '24px' }}>
         <div style={{ padding: '12px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
           <div style={{ fontSize: '12px', color: '#64748b' }}>Заполняемость зала</div>
@@ -56,12 +97,11 @@ export const AnalyticsDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Data Visualization (Визуализация статусов) */}
+      {/* Визуализация полосы статусов */}
       <h3 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '8px' }}>
-        📈 Диаграмма статусов приглашений
+        📈 Общая диаграмма статусов приглашений
       </h3>
       
-      {/* Пропорциональная шкала */}
       <div style={{
         display: 'flex',
         height: '20px',
@@ -76,7 +116,6 @@ export const AnalyticsDashboard: React.FC = () => {
         <div style={{ width: `${declinedRate}%`, backgroundColor: '#ef4444', transition: 'width 0.3s' }} title="Отклонили" />
       </div>
 
-      {/* Легенда диаграммы */}
       <div style={{ display: 'flex', gap: '16px', fontSize: '13px', flexWrap: 'wrap', marginBottom: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <span style={{ width: '12px', height: '12px', backgroundColor: '#22c55e', borderRadius: '3px', display: 'inline-block' }}></span>
@@ -92,25 +131,28 @@ export const AnalyticsDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Интерактивная панель изменения значений */}
-      <div style={{ paddingTop: '16px', borderTop: '1px solid #f1f5f9', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
-        <div>
-          <label style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '4px' }}>Подтвердили:</label>
-          <input type="number" value={confirmedGuests} onChange={(e) => setConfirmedGuests(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+      {/* Интерактивный калькулятор показателей */}
+      <details style={{ marginTop: '12px', fontSize: '13px', color: '#64748b' }}>
+        <summary style={{ cursor: 'pointer', fontWeight: '500' }}>⚙️ Симуляция данных / Настройка параметров</summary>
+        <div style={{ paddingTop: '12px', marginTop: '8px', borderTop: '1px solid #f1f5f9', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
+          <div>
+            <label style={{ fontSize: '12px', display: 'block', marginBottom: '4px' }}>Подтвердили:</label>
+            <input type="number" value={confirmedGuests} onChange={(e) => setConfirmedGuests(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+          </div>
+          <div>
+            <label style={{ fontSize: '12px', display: 'block', marginBottom: '4px' }}>В ожидании:</label>
+            <input type="number" value={pendingGuests} onChange={(e) => setPendingGuests(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+          </div>
+          <div>
+            <label style={{ fontSize: '12px', display: 'block', marginBottom: '4px' }}>Отклонили:</label>
+            <input type="number" value={declinedGuests} onChange={(e) => setDeclinedGuests(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+          </div>
+          <div>
+            <label style={{ fontSize: '12px', display: 'block', marginBottom: '4px' }}>Вместимость зала:</label>
+            <input type="number" value={hallCapacity} onChange={(e) => setHallCapacity(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+          </div>
         </div>
-        <div>
-          <label style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '4px' }}>В ожидании:</label>
-          <input type="number" value={pendingGuests} onChange={(e) => setPendingGuests(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
-        </div>
-        <div>
-          <label style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '4px' }}>Отклонили:</label>
-          <input type="number" value={declinedGuests} onChange={(e) => setDeclinedGuests(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
-        </div>
-        <div>
-          <label style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '4px' }}>Вместимость зала:</label>
-          <input type="number" value={hallCapacity} onChange={(e) => setHallCapacity(Number(e.target.value))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
-        </div>
-      </div>
+      </details>
     </div>
   )
 }
