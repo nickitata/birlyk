@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { GuestLookup } from "@/components/GuestLookup";
 import { SmartPlanner } from '../components/SmartPlanner';
 import { AnalyticsDashboard } from '../components/AnalyticsDashboard';
+import { EventShare } from '../components/EventShare';
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -55,6 +56,7 @@ function Index() {
       <div className="mx-auto max-w-6xl px-4 py-8">
         <SmartPlanner />
         <AnalyticsDashboard />
+        <EventShare />
       </div>
 
       <section className="mx-auto grid max-w-6xl gap-5 px-4 py-20 md:grid-cols-3">
