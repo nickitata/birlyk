@@ -36,3 +36,17 @@ From the workspace root, run:
 
 The API listens on `http://localhost:8080`. Open that address or
 `http://localhost:8080/api/health` to check that it is running.
+
+## 🛡️ Cybersecurity Analysis & Improvements
+
+### 1. Identified Security Risks
+1. **Unrestricted Guest Data Access via Supabase RLS**
+   * **Risk Description:** If Row Level Security (RLS) is improperly configured on the `guests` table, unauthorized users can issue a wildcard API query (`SELECT *`) to scrape sensitive guest details (full names, phone numbers, seating assignments).
+   * **Impact:** Violation of user privacy and personal data leakage (PII).
+
+2. **Client-Side Authorization Bypass**
+   * **Risk Description:** Relying solely on React Router guards (`/_authenticated/dashboard`) without enforcing server-side JWT verification for API calls allows attackers to manipulate local state and attempt unauthorized backend operations.
+   * **Impact:** Unauthorized access to event management and modification privileges.
+
+### 2. Proposed Security Improvement
+* **Enforce Strict Row-Level Security (RLS) Policies:** Configure database-level access controls in Supabase where read operations for unauthenticated visitors are restricted strictly to single-record matching during guest lookup, while data modifications require `auth.uid() == event.owner_id`.
