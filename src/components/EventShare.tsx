@@ -1,21 +1,45 @@
 import React, { useState } from 'react';
+import { useI18n } from '@/lib/i18n';
 
 interface EventShareProps {
   eventId?: string;
-  eventName?: string;
 }
 
-export const EventShare: React.FC<EventShareProps> = ({
-  eventId = 'event-8932',
-  eventName = 'Мой праздник'
-}) => {
+export const EventShare: React.FC<EventShareProps> = ({ eventId = 'event-8932' }) => {
+  const { language } = useI18n() as any;
+  const lang = (language || 'ru') as 'ru' | 'kk' | 'en' | 'az';
   const [copied, setCopied] = useState(false);
 
-  // Статичная ссылка на базе уникального ID события
+  const dict = {
+    ru: {
+      title: '🔗 Постоянная ссылка и QR-код для гостей',
+      desc: `Ссылка и QR-код привязаны к ID события (${eventId}). Изменяйте данные мероприятия — QR-код останется прежним!`,
+      copy: 'Копировать',
+      copied: '✓ Скопировано'
+    },
+    kk: {
+      title: '🔗 Қонақтарға арналған тұрақты сілтеме мен QR-код',
+      desc: `Сілтеме мен QR-код оқиға ID-іне (${eventId}) байланыстырылған. Түзетулер енгізсеңіз де, QR-код өзгермейді!`,
+      copy: 'Көшіру',
+      copied: '✓ Көшірілді'
+    },
+    en: {
+      title: '🔗 Static Share Link & Guest QR Code',
+      desc: `The link and QR code are bound to event ID (${eventId}). Update details anytime — the QR code stays identical!`,
+      copy: 'Copy Link',
+      copied: '✓ Copied'
+    },
+    az: {
+      title: '🔗 Qonaqlar üçün daimi keçid və QR kod',
+      desc: `Keçid və QR kod tədbir ID-sinə (${eventId}) bağlıdır. Məlumatları dəyişsəniz də, QR kod eyni qalacaq!`,
+      copy: 'Kopyala',
+      copied: '✓ Kopyalandı'
+    }
+  };
+
+  const t = dict[lang] || dict.ru;
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8080';
   const shareUrl = `${baseUrl}/event/${eventId}`;
-
-  // Генерация неизменяемого QR-кода через открытый генератор
   const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}`;
 
   const handleCopy = async () => {
@@ -24,67 +48,25 @@ export const EventShare: React.FC<EventShareProps> = ({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Ошибка при копировании ссылки:', err);
+      console.error(err);
     }
   };
 
   return (
-    <div style={{
-      border: '1px solid #e2e8f0',
-      borderRadius: '12px',
-      padding: '24px',
-      backgroundColor: '#ffffff',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-      marginTop: '20px',
-      color: '#0f172a'
-    }}>
-      <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>
-        🔗 Постоянная ссылка и QR-код для гостей
-      </h2>
-      <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px' }}>
-        Ссылка и QR-код привязаны к <strong>ID события ({eventId})</strong>. Редактируйте даты, место и детали — ссылка и код останутся прежними!
-      </p>
+    <div style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '24px', backgroundColor: '#ffffff', marginTop: '20px', color: '#0f172a' }}>
+      <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '6px' }}>{t.title}</h2>
+      <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px' }}>{t.desc}</p>
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-        {/* Генерация и отображение QR-кода */}
-        <div style={{ padding: '12px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-          <img src={qrCodeApiUrl} alt={`QR Code for ${eventName}`} style={{ width: '180px', height: '180px', display: 'block' }} />
+        <div style={{ padding: '12px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '12px' }}>
+          <img src={qrCodeApiUrl} alt="Event QR Code" style={{ width: '160px', height: '160px' }} />
         </div>
 
-        {/* Инпут с ссылкой и кнопкой копирования */}
-        <div style={{ width: '100%', maxWidth: '450px' }}>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <input
-              type="text"
-              readOnly
-              value={shareUrl}
-              style={{
-                flex: 1,
-                padding: '10px 12px',
-                borderRadius: '6px',
-                border: '1px solid #cbd5e1',
-                fontSize: '13px',
-                backgroundColor: '#f8fafc',
-                outline: 'none'
-              }}
-            />
-            <button
-              onClick={handleCopy}
-              style={{
-                padding: '10px 18px',
-                borderRadius: '6px',
-                backgroundColor: copied ? '#16a34a' : '#2563eb',
-                color: '#ffffff',
-                border: 'none',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              {copied ? '✓ Скопировано' : 'Копировать'}
-            </button>
-          </div>
+        <div style={{ width: '100%', maxWidth: '450px', display: 'flex', gap: '8px' }}>
+          <input type="text" readOnly value={shareUrl} style={{ flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px', backgroundColor: '#f8fafc' }} />
+          <button onClick={handleCopy} style={{ padding: '8px 16px', borderRadius: '6px', backgroundColor: copied ? '#16a34a' : '#2563eb', color: '#ffffff', border: 'none', fontWeight: '600', cursor: 'pointer' }}>
+            {copied ? t.copied : t.copy}
+          </button>
         </div>
       </div>
     </div>

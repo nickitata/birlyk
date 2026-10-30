@@ -73,5 +73,5 @@ function Index() {
         ))}
       </section>
     </main>
-  );
+  )
 }
