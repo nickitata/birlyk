@@ -2,8 +2,23 @@ import React, { useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 
 export const SmartPlanner: React.FC = () => {
-  const { language } = useI18n() as any;
-  const lang = (language || 'ru') as 'ru' | 'kk' | 'en' | 'az';
+  const i18n = useI18n() as any;
+  
+  // Универсальное считывание языка из любого формата i18n
+  const rawLang = String(
+    i18n?.language || 
+    i18n?.lang || 
+    i18n?.locale || 
+    i18n?.currentLanguage || 
+    localStorage.getItem('language') || 
+    localStorage.getItem('i18nextLng') || 
+    'ru'
+  ).toLowerCase();
+
+  let lang: 'ru' | 'kk' | 'en' | 'az' = 'ru';
+  if (rawLang.includes('kk') || rawLang.includes('kz')) lang = 'kk';
+  else if (rawLang.includes('en')) lang = 'en';
+  else if (rawLang.includes('az')) lang = 'az';
 
   const [guests, setGuests] = useState<number>(50);
   const [seatingType, setSeatingType] = useState<string>('banquet');
@@ -48,12 +63,11 @@ export const SmartPlanner: React.FC = () => {
       classroom: 'Təqdimat / Təlim (Sıralar)',
       cocktail: 'Furşet / Kokteyl',
       capacity: 'Seçilmiş zalın tutumu (nəfər):',
-      result: (tables: number, seats: number) => `💡 Hesablama нәticəsi: Sizə ${tables} masa lazım olacaq (hər birində ${seats} yer).`
+      result: (tables: number, seats: number) => `💡 Hesablama nəticəsi: Sizə ${tables} masa lazım olacaq (hər birində ${seats} yer).`
     }
   };
 
   const t = dict[lang] || dict.ru;
-
   const seatsPerTable = seatingType === 'banquet' ? 8 : seatingType === 'classroom' ? 6 : 10;
   const tablesNeeded = Math.ceil(guests / seatsPerTable);
 
@@ -86,5 +100,5 @@ export const SmartPlanner: React.FC = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

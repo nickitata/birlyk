@@ -6,8 +6,22 @@ interface EventShareProps {
 }
 
 export const EventShare: React.FC<EventShareProps> = ({ eventId = 'event-8932' }) => {
-  const { language } = useI18n() as any;
-  const lang = (language || 'ru') as 'ru' | 'kk' | 'en' | 'az';
+  const i18n = useI18n() as any;
+  const rawLang = String(
+    i18n?.language || 
+    i18n?.lang || 
+    i18n?.locale || 
+    i18n?.currentLanguage || 
+    localStorage.getItem('language') || 
+    localStorage.getItem('i18nextLng') || 
+    'ru'
+  ).toLowerCase();
+
+  let lang: 'ru' | 'kk' | 'en' | 'az' = 'ru';
+  if (rawLang.includes('kk') || rawLang.includes('kz')) lang = 'kk';
+  else if (rawLang.includes('en')) lang = 'en';
+  else if (rawLang.includes('az')) lang = 'az';
+
   const [copied, setCopied] = useState(false);
 
   const dict = {
@@ -70,5 +84,5 @@ export const EventShare: React.FC<EventShareProps> = ({ eventId = 'event-8932' }
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
