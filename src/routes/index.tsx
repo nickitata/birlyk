@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { GuestLookup } from "@/components/GuestLookup";
 import { SmartPlanner } from '../components/SmartPlanner';
+import { AnalyticsDashboard } from '../components/AnalyticsDashboard';
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -53,6 +54,7 @@ function Index() {
       </section>
       <div className="mx-auto max-w-6xl px-4 py-8">
         <SmartPlanner />
+        <AnalyticsDashboard />
       </div>
 
       <section className="mx-auto grid max-w-6xl gap-5 px-4 py-20 md:grid-cols-3">
