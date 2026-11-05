@@ -37,9 +37,9 @@ From the workspace root, run:
 The API listens on `http://localhost:8080`. Open that address or
 `http://localhost:8080/api/health` to check that it is running.
 
-## 🛡️ Cybersecurity Analysis & Improvements
+🛡️ Cybersecurity Analysis & Improvements
 
-### 1. Identified Security Risks
+## 1. Identified Security Risks
 1. **Unrestricted Guest Data Access via Supabase RLS**
    * **Risk Description:** If Row Level Security (RLS) is improperly configured on the `guests` table, unauthorized users can issue a wildcard API query (`SELECT *`) to scrape sensitive guest details (full names, phone numbers, seating assignments).
    * **Impact:** Violation of user privacy and personal data leakage (PII).
