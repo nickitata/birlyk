@@ -8,6 +8,19 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function SiteHeader() {
+  const [isDark, setIsDark] = useState(() => {
+    return localStorage.getItem('theme') === 'dark';
+  });
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDark]);
   const { t, lang, setLang } = useI18n();
   const [signedIn, setSignedIn] = useState(false);
   const navigate = useNavigate();
@@ -52,6 +65,13 @@ export function SiteHeader() {
               {LANGS.map((l) => <SelectItem key={l.code} value={l.code}>{l.label}</SelectItem>)}
             </SelectContent>
           </Select>
+          <button
+            type="button"
+            onClick={() => setIsDark(!isDark)}
+            className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium text-sm transition-transform hover:scale-105 active:scale-95 border border-slate-200 dark:border-slate-700"
+          >
+            {isDark ? '☀️ Светлая' : '🌙 Тёмная'}
+          </button>
           {signedIn ? (
             <>
               <Button asChild size="sm" className="rounded-full"><Link to="/dashboard">{t("nav_dashboard")}</Link></Button>
