@@ -72,7 +72,9 @@ export const SmartPlanner: React.FC = () => {
   const tablesNeeded = Math.ceil(guests / seatsPerTable);
 
   return (
-    <div style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '24px', backgroundColor: '#ffffff', color: '#0f172a' }}>
+    <div 
+      className="transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl"
+      style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '24px', backgroundColor: '#ffffff', color: '#0f172a' }}>
       <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>{t.title}</h2>
       
       <div style={{ display: 'grid', gap: '12px' }}>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
+import confetti from 'canvas-confetti';
 
 interface GuestRSVPProps {
   eventId?: string;
@@ -153,18 +154,28 @@ export const GuestRSVP: React.FC<GuestRSVPProps> = ({ eventId = 'event-8932' }) 
       console.log('Saved locally (fallback)');
     }
 
+    // 1. Устанавливаем состояние успешной отправки
     setSubmitted(true);
-  };
+
+    // 2. Запускаем конфетти
+    confetti({
+      particleCount: 80,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  }; // <-- Закрывающая скобка функции handleSubmit должна быть ПОСЛЕ конфетти!
 
   return (
-    <div style={{
-      border: '1px solid #e2e8f0',
-      borderRadius: '12px',
-      padding: '24px',
-      backgroundColor: '#ffffff',
-      boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-      marginTop: '20px',
-      color: '#0f172a'
+    <div 
+        className="transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl"
+        style={{
+            border: '1px solid #e2e8f0',
+            borderRadius: '12px',
+            padding: '24px',
+            backgroundColor: '#ffffff',
+            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+            marginTop: '20px',
+            color: '#0f172a'
     }}>
       <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '4px' }}>{t.title}</h2>
       <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px' }}>{t.subtitle}</p>
@@ -253,6 +264,7 @@ export const GuestRSVP: React.FC<GuestRSVPProps> = ({ eventId = 'event-8932' }) 
 
           <button
             type="submit"
+            className="transition-transform active:scale-95 hover:scale-105"
             style={{
               padding: '10px',
               borderRadius: '6px',

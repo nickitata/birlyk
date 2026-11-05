@@ -78,7 +78,9 @@ export const EventShare: React.FC<EventShareProps> = ({ eventId = 'event-8932' }
 
         <div style={{ width: '100%', maxWidth: '450px', display: 'flex', gap: '8px' }}>
           <input type="text" readOnly value={shareUrl} style={{ flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px', backgroundColor: '#f8fafc' }} />
-          <button onClick={handleCopy} style={{ padding: '8px 16px', borderRadius: '6px', backgroundColor: copied ? '#16a34a' : '#2563eb', color: '#ffffff', border: 'none', fontWeight: '600', cursor: 'pointer' }}>
+          <button onClick={handleCopy} 
+            className="transition-transform active:scale-95 hover:scale-105"
+            style={{ padding: '8px 16px', borderRadius: '6px', backgroundColor: copied ? '#16a34a' : '#2563eb', color: '#ffffff', border: 'none', fontWeight: '600', cursor: 'pointer' }}>
             {copied ? t.copied : t.copy}
           </button>
         </div>
