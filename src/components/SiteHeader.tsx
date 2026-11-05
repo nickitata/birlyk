@@ -7,11 +7,25 @@ import { LANGS, useI18n, type Lang } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export function SiteHeader() {
-  const [isDark, setIsDark] = useState(() => {
-    return localStorage.getItem('theme') === 'dark';
-  });
+const themeLabels: Record<string, { light: string; dark: string }> = {
+  ru: { light: "Светлая", dark: "Тёмная" },
+  en: { light: "Light", dark: "Dark" },
+  kk: { light: "Жарық", dark: "Қараңғы" },
+  az: { light: "Açıq", dark: "Tünd" },
+};
 
+export function SiteHeader() {
+  const [isDark, setIsDark] = useState(false);
+
+  // Считываем значение из localStorage только после загрузки компонента в браузере
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      setIsDark(true);
+    }
+  }, []);
+
+  // Переключаем класс 'dark' у HTML-элемента
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add('dark');
@@ -70,14 +84,23 @@ export function SiteHeader() {
             onClick={() => setIsDark(!isDark)}
             className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium text-sm transition-transform hover:scale-105 active:scale-95 border border-slate-200 dark:border-slate-700"
           >
-            {isDark ? '☀️ Светлая' : '🌙 Тёмная'}
+           {isDark 
+  ? `☀️ ${themeLabels[lang]?.light || "Light"}` 
+  : `🌙 ${themeLabels[lang]?.dark || "Dark"}`}
           </button>
           {signedIn ? (
-            <>
-              <Button asChild size="sm" className="rounded-full"><Link to="/dashboard">{t("nav_dashboard")}</Link></Button>
-              <Button variant="ghost" size="sm" onClick={signOut}>{t("nav_signout")}</Button>
-            </>
-          ) : (
+  <>
+    <Button asChild variant="ghost" size="sm" className="rounded-full">
+      <Link to="/profile">Профиль</Link>
+    </Button>
+    <Button asChild size="sm" className="rounded-full">
+      <Link to="/dashboard">{t("nav_dashboard")}</Link>
+    </Button>
+    <Button variant="ghost" size="sm" onClick={signOut}>
+      {t("nav_signout")}
+    </Button>
+  </>
+) : (
             <Button asChild size="sm" className="rounded-full"><Link to="/auth">{t("nav_signin")}</Link></Button>
           )}
         </nav>
