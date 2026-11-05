@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 
-export const GuestRSVP: React.FC = () => {
+interface GuestRSVPProps {
+  eventId?: string;
+}
+export const GuestRSVP: React.FC<GuestRSVPProps> = ({ eventId = 'event-8932' }) => {
   const i18n = useI18n() as any;
   const rawLang = String(
     i18n?.language || 
@@ -143,6 +146,7 @@ export const GuestRSVP: React.FC = () => {
           phone: phone.trim(),
           status: status,
           dietary_notes: diet !== 'none' ? diet : note,
+          event_id: eventId,
         }
       ]);
     } catch (err) {
