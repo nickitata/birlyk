@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { SmartPlanner } from '../../components/SmartPlanner';
+import { CreateEventModal } from '../../components/CreateEventModal';
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Birlyk" }, { name: "description", content: "Manage your events, guests and venue maps." }] }),
@@ -26,7 +27,7 @@ function Dashboard() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [title, setTitle] = useState("");
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const profile = useQuery({
     queryKey: ["profile", user.id],
     queryFn: async () => (await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle()).data,
@@ -71,10 +72,14 @@ function Dashboard() {
 
       <SmartPlanner /> 
       
-      <form onSubmit={create} className="mt-6 flex gap-2 max-w-xl">
-        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("ev_title")} className="h-11 rounded-xl" maxLength={120} />
-        <Button type="submit" className="h-11 rounded-xl"><Plus className="h-4 w-4" />{t("dash_new")}</Button>
-      </form>
+      <Button 
+  type="button" 
+  onClick={() => setIsModalOpen(true)} 
+  className="mt-6 h-11 rounded-xl gap-2 bg-[#fcd89a] text-[#33211b] font-bold hover:brightness-105"
+>
+  <Plus className="h-4 w-4" />
+  {t("dash_new")}
+</Button>
 
       <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {events.data?.length === 0 && <p className="text-muted-foreground">{t("dash_empty")}</p>}
@@ -90,6 +95,13 @@ function Dashboard() {
           </Link>
         ))}
       </div>
+      <CreateEventModal
+  isOpen={isModalOpen}
+  onClose={() => setIsModalOpen(false)}
+  onSubmitSuccess={() => {
+    qc.invalidateQueries({ queryKey: ["events"] });
+  }}
+/>
     </main>
   );
 }

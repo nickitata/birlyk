@@ -7,7 +7,35 @@ interface Props {
   onSelectTemplate: (templateId: TemplateId, customFields: any[]) => void;
 }
 
+const selectorTranslations = {
+  ru: {
+    sectionTitle: 'Выберите тип мероприятия / Выбор сценария',
+    includedFields: 'Включённые поля для гостей',
+    customNotice: 'В кастомном шаблоне вы можете добавить любые уникальные поля вручную.',
+    addField: '+ Добавить своё поле',
+  },
+  en: {
+    sectionTitle: 'Select Event Type / Template',
+    includedFields: 'Included Guest Fields',
+    customNotice: 'In a custom template, you can manually add any unique fields.',
+    addField: '+ Add custom field',
+  },
+  kk: {
+    sectionTitle: 'Іс-шара түрін / Сценарийді таңдаңыз',
+    includedFields: 'Қонақтарға арналған енгізілген өрістер',
+    customNotice: 'Кастомды шаблонда кез келген бірегей өрістерді қолмен қоса аласыз.',
+    addField: '+ Өз өрісіңді қосу',
+  },
+  az: {
+    sectionTitle: 'Tədbir növünü / Ssenarini seçin',
+    includedFields: 'Qonaqlar üçün daxil edilmiş sahələr',
+    customNotice: 'Fərdi şablonda istənilən unikal sahələri əl ilə əlavə edə bilərsiniz.',
+    addField: '+ Öz sahəni əlavə et',
+  },
+};
+
 export function EventTemplateSelector({ currentLang = 'ru', onSelectTemplate }: Props) {
+  const t = selectorTranslations[currentLang] || selectorTranslations.ru;
   const [selected, setSelected] = useState<TemplateId>('wedding');
   const [activeFields, setActiveFields] = useState(EVENT_TEMPLATES.wedding.fields);
 
@@ -20,7 +48,7 @@ export function EventTemplateSelector({ currentLang = 'ru', onSelectTemplate }: 
   return (
     <div className="space-y-6 text-[#f7ece9]">
       <h3 className="text-lg font-bold text-[#fcd89a]">
-        Выберите тип мероприятия / Выбор сценария
+        {t.sectionTitle}
       </h3>
 
       {/* Карточки типов */}
@@ -56,10 +84,10 @@ export function EventTemplateSelector({ currentLang = 'ru', onSelectTemplate }: 
       {/* Список включённых полей выбранного шаблона */}
       <div className="bg-[#3f2b24] p-4 rounded-xl border border-[#4d352c] space-y-3">
         <h4 className="text-sm font-semibold text-[#fcd89a] flex justify-between items-center">
-          <span>Включённые поля для гостей ({activeFields.length})</span>
+          <span>{t.includedFields} ({activeFields.length})</span>
           {selected === 'custom' && (
             <button type="button" className="text-xs text-[#fcd89a] underline flex items-center gap-1">
-              <Plus size={12} /> Добавить своё поле
+              <Plus size={12} /> {t.addField}
             </button>
           )}
         </h4>
